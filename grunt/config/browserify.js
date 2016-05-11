@@ -19,13 +19,7 @@ var LICENSE_TEMPLATE =
   grunt.file.read('./grunt/data/header-template-extended.txt');
 
 function minify(src) {
-  return UglifyJS.minify(
-    src, {
-      fromString: true,
-      output: {
-        beautify: true
-      }
-    }).code;
+  return UglifyJS.minify(src, {fromString: true}).code;
 }
 
 // TODO: move this out to another build step maybe.

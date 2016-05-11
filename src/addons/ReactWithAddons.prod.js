@@ -27,9 +27,5 @@ React.addons = {
   createFragment: ReactFragment.create,
 };
 
-if (__DEV__) {
-  React.addons.Perf = require('ReactDefaultPerf');
-  React.addons.TestUtils = require('ReactTestUtils');
-}
 
 module.exports = React;

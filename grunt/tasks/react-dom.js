@@ -9,6 +9,7 @@ var LICENSE_TEMPLATE =
 function build(name, filename) {
   var srcFile = `vendor/${filename}.js`;
   var destFile = `build/${filename}.js`;
+  var destFileProd = `build/${filename}.prod.js`;
   var destFileMin = `build/${filename}.min.js`;
   var templateData = {
     package: name,
@@ -21,6 +22,7 @@ function build(name, filename) {
   var src = grunt.file.read(srcFile);
   var srcMin = UglifyJS.minify(src, {fromString: true}).code;
   grunt.file.write(destFile, header + src);
+  grunt.file.write(destFileProd, header + src);
   grunt.file.write(destFileMin, header + srcMin);
 }
 

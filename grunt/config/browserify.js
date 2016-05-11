@@ -67,6 +67,19 @@ var basic = {
   after: [derequire, simpleBannerify],
 };
 
+var prod = {
+  entries: [
+    './build/modules/React.js',
+  ],
+  outfile: './build/react.prod.js',
+  debug: false,
+  standalone: 'React',
+  // Apply as global transform so that we also envify fbjs and any other deps
+  globalTransforms: [envifyProd],
+  plugins: [collapser],
+  after: [derequire, bannerify],
+};
+
 var min = {
   entries: [
     './build/modules/React.js',
@@ -98,6 +111,19 @@ var addons = {
   after: [derequire, simpleBannerify],
 };
 
+var addonsProd = {
+  entries: [
+    './build/modules/ReactWithAddons.prod.js',
+  ],
+  outfile: './build/react-with-addons.prod.js',
+  debug: false,
+  standalone: 'React',
+  packageName: 'React (with addons)',
+  globalTransforms: [envifyProd],
+  plugins: [collapser],
+  after: [derequire, bannerify],
+};
+
 var addonsMin = {
   entries: [
     './build/modules/ReactWithAddons.js',
@@ -117,7 +143,9 @@ var addonsMin = {
 
 module.exports = {
   basic: basic,
+  prod: prod,
   min: min,
   addons: addons,
+  addonsProd: addonsProd,
   addonsMin: addonsMin,
 };

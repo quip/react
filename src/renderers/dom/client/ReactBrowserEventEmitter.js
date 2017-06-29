@@ -279,6 +279,8 @@ var ReactBrowserEventEmitter = Object.assign({}, ReactEventEmitterMixin, {
               mountAt
             );
           } else {
+            // This an IE8 only code path, we don't care about accesing the
+            // global window.
             ReactBrowserEventEmitter.ReactEventListener.trapBubbledEvent(
               topLevelTypes.topScroll,
               'scroll',

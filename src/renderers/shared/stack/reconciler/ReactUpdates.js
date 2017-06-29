@@ -14,6 +14,7 @@
 var CallbackQueue = require('CallbackQueue');
 var PooledClass = require('PooledClass');
 var ReactFeatureFlags = require('ReactFeatureFlags');
+var ReactLastActiveThing = require('ReactLastActiveThing');
 var ReactReconciler = require('ReactReconciler');
 var Transaction = require('Transaction');
 
@@ -150,6 +151,8 @@ function runBatchedUpdates(transaction) {
     // that performUpdateIfNecessary is a noop.
     var component = dirtyComponents[i];
 
+    ReactLastActiveThing.thing = component;
+
     // If performUpdateIfNecessary happens to enqueue any new updates, we
     // shouldn't execute the callbacks until the next render happens, so
     // stash the callbacks first
@@ -198,6 +201,7 @@ var flushBatchedUpdates = function() {
   // updates enqueued by setState callbacks and asap calls.
   while (dirtyComponents.length || asapEnqueued) {
     if (dirtyComponents.length) {
+      ReactLastActiveThing.thing = dirtyComponents[0];
       var transaction = ReactUpdatesFlushTransaction.getPooled();
       transaction.perform(runBatchedUpdates, null, transaction);
       ReactUpdatesFlushTransaction.release(transaction);
@@ -218,6 +222,8 @@ var flushBatchedUpdates = function() {
  * list of functions which will be executed once the rerender occurs.
  */
 function enqueueUpdate(component) {
+  ReactLastActiveThing.thing = component;
+
   ensureInjected();
 
   // Various parts of our code (such as ReactCompositeComponent's

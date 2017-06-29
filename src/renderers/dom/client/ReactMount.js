@@ -22,6 +22,7 @@ var ReactElement = require('ReactElement');
 var ReactFeatureFlags = require('ReactFeatureFlags');
 var ReactInstanceMap = require('ReactInstanceMap');
 var ReactInstrumentation = require('ReactInstrumentation');
+var ReactLastActiveThing = require('ReactLastActiveThing');
 var ReactMarkupChecksum = require('ReactMarkupChecksum');
 var ReactReconciler = require('ReactReconciler');
 var ReactUpdateQueue = require('ReactUpdateQueue');
@@ -422,6 +423,7 @@ var ReactMount = {
 
   _renderSubtreeIntoContainer: function(parentComponent, nextElement, container, callback) {
     ReactUpdateQueue.validateCallback(callback, 'ReactDOM.render');
+    ReactLastActiveThing.thing = container;
     invariant(
       ReactElement.isValidElement(nextElement),
       'ReactDOM.render(): Invalid component element.%s',

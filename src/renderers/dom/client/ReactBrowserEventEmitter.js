@@ -278,6 +278,8 @@ var ReactBrowserEventEmitter = assign({}, ReactEventEmitterMixin, {
               mountAt
             );
           } else {
+            // This an IE8 only code path, we don't care about accesing the
+            // global window.
             ReactBrowserEventEmitter.ReactEventListener.trapBubbledEvent(
               topLevelTypes.topScroll,
               'scroll',
@@ -356,7 +358,7 @@ var ReactBrowserEventEmitter = assign({}, ReactEventEmitterMixin, {
    *
    * @see http://www.quirksmode.org/dom/events/scroll.html
    */
-  ensureScrollValueMonitoring: function(){
+  ensureScrollValueMonitoring: function() {
     if (hasEventPageXY === undefined) {
       hasEventPageXY =
         document.createEvent && 'pageX' in document.createEvent('MouseEvent');

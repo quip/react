@@ -15,10 +15,10 @@ var ReactDOMSelection = require('ReactDOMSelection');
 
 var containsNode = require('containsNode');
 var focusNode = require('focusNode');
-var getActiveElement = require('getActiveElement');
+var getActiveElement = require('getActiveElementForCurrentWindow');
 
 function isInDocument(node) {
-  return containsNode(document.documentElement, node);
+  return node.ownerDocument && containsNode(node.ownerDocument.documentElement, node);
 }
 
 /**

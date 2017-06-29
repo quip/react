@@ -19,6 +19,7 @@ var ReactElement = require('ReactElement');
 var ReactEmptyComponentRegistry = require('ReactEmptyComponentRegistry');
 var ReactInstanceHandles = require('ReactInstanceHandles');
 var ReactInstanceMap = require('ReactInstanceMap');
+var ReactLastActiveThing = require('ReactLastActiveThing');
 var ReactMarkupChecksum = require('ReactMarkupChecksum');
 var ReactPerf = require('ReactPerf');
 var ReactReconciler = require('ReactReconciler');
@@ -591,6 +592,7 @@ var ReactMount = {
   },
 
   _renderSubtreeIntoContainer: function(parentComponent, nextElement, container, callback) {
+    ReactLastActiveThing.thing = container;
     invariant(
       ReactElement.isValidElement(nextElement),
       'ReactDOM.render(): Invalid component element.%s',

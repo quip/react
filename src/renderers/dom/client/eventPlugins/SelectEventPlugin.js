@@ -17,7 +17,7 @@ var ExecutionEnvironment = require('ExecutionEnvironment');
 var ReactInputSelection = require('ReactInputSelection');
 var SyntheticEvent = require('SyntheticEvent');
 
-var getActiveElement = require('getActiveElement');
+var getActiveElement = require('getActiveElementForCurrentWindow');
 var isTextInputElement = require('isTextInputElement');
 var keyOf = require('keyOf');
 var shallowEqual = require('shallowEqual');
@@ -68,14 +68,15 @@ var ON_SELECT_KEY = keyOf({onSelect: null});
  * @return {object}
  */
 function getSelection(node) {
+  var currentWindow = node.ownerDocument.defaultView;
   if ('selectionStart' in node &&
       ReactInputSelection.hasSelectionCapabilities(node)) {
     return {
       start: node.selectionStart,
       end: node.selectionEnd,
     };
-  } else if (window.getSelection) {
-    var selection = window.getSelection();
+  } else if (currentWindow.getSelection) {
+    var selection = currentWindow.getSelection();
     return {
       anchorNode: selection.anchorNode,
       anchorOffset: selection.anchorOffset,
@@ -83,6 +84,8 @@ function getSelection(node) {
       focusOffset: selection.focusOffset,
     };
   } else if (document.selection) {
+    // This an IE8 only code path, we don't care about accesing the global
+    // window.
     var range = document.selection.createRange();
     return {
       parentElement: range.parentElement(),

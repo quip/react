@@ -12,14 +12,17 @@
 'use strict';
 
 var invariant = require('invariant');
+var keyOf = require('keyOf');
+
+var HOST_NODE_KEY = keyOf({_hostNode: null});
 
 /**
  * Return the lowest common ancestor of A and B, or null if they are in
  * different trees.
  */
 function getLowestCommonAncestor(instA, instB) {
-  invariant('_hostNode' in instA, 'getNodeFromInstance: Invalid argument.');
-  invariant('_hostNode' in instB, 'getNodeFromInstance: Invalid argument.');
+  invariant(HOST_NODE_KEY in instA, 'getNodeFromInstance: Invalid argument.');
+  invariant(HOST_NODE_KEY in instB, 'getNodeFromInstance: Invalid argument.');
 
   var depthA = 0;
   for (var tempA = instA; tempA; tempA = tempA._hostParent) {
@@ -58,8 +61,8 @@ function getLowestCommonAncestor(instA, instB) {
  * Return if A is an ancestor of B.
  */
 function isAncestor(instA, instB) {
-  invariant('_hostNode' in instA, 'isAncestor: Invalid argument.');
-  invariant('_hostNode' in instB, 'isAncestor: Invalid argument.');
+  invariant(HOST_NODE_KEY in instA, 'isAncestor: Invalid argument.');
+  invariant(HOST_NODE_KEY in instB, 'isAncestor: Invalid argument.');
 
   while (instB) {
     if (instB === instA) {
@@ -74,7 +77,7 @@ function isAncestor(instA, instB) {
  * Return the parent instance of the passed-in instance.
  */
 function getParentInstance(inst) {
-  invariant('_hostNode' in inst, 'getParentInstance: Invalid argument.');
+  invariant(HOST_NODE_KEY in inst, 'getParentInstance: Invalid argument.');
 
   return inst._hostParent;
 }

@@ -427,7 +427,7 @@ var ReactMount = {
     invariant(
       ReactElement.isValidElement(nextElement),
       'ReactDOM.render(): Invalid component element.%s',
-      (
+      __DEV__ ? (
         typeof nextElement === 'string' ?
           ' Instead of passing a string like \'div\', pass ' +
           'React.createElement(\'div\') or <div />.' :
@@ -439,7 +439,7 @@ var ReactMount = {
           ' This may be caused by unintentionally loading two independent ' +
           'copies of React.' :
           ''
-      )
+      ) : ''
     );
 
     warning(

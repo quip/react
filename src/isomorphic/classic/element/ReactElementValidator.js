@@ -18,6 +18,8 @@
 
 'use strict';
 
+if (__DEV__) {
+
 var ReactCurrentOwner = require('ReactCurrentOwner');
 var ReactComponentTreeHook = require('ReactComponentTreeHook');
 var ReactElement = require('ReactElement');
@@ -266,5 +268,7 @@ var ReactElementValidator = {
   },
 
 };
+
+}
 
 module.exports = ReactElementValidator;

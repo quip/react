@@ -163,14 +163,14 @@ function purgeDeep(id) {
 }
 
 function describeComponentFrame(name, source, ownerName) {
-  return '\n    in ' + name + (
+  return __DEV__ ? ('\n    in ' + name + (
     source ?
       ' (at ' + source.fileName.replace(/^.*[\\\/]/, '') + ':' +
       source.lineNumber + ')' :
     ownerName ?
       ' (created by ' + ownerName + ')' :
       ''
-  );
+  )) : '';
 }
 
 function getDisplayName(element) {

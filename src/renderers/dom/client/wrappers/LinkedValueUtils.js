@@ -63,11 +63,11 @@ var propTypes = {
         props.disabled) {
       return null;
     }
-    return new Error(
+    return new Error(__DEV__ ?
       'You provided a `value` prop to a form field without an ' +
       '`onChange` handler. This will render a read-only field. If ' +
       'the field should be mutable use `defaultValue`. Otherwise, ' +
-      'set either `onChange` or `readOnly`.'
+      'set either `onChange` or `readOnly`.' : 0
     );
   },
   checked: function(props, propName, componentName) {
@@ -77,11 +77,11 @@ var propTypes = {
         props.disabled) {
       return null;
     }
-    return new Error(
+    return new Error(__DEV__ ?
       'You provided a `checked` prop to a form field without an ' +
       '`onChange` handler. This will render a read-only field. If ' +
       'the field should be mutable use `defaultChecked`. Otherwise, ' +
-      'set either `onChange` or `readOnly`.'
+      'set either `onChange` or `readOnly`.' : 0
     );
   },
   onChange: ReactPropTypes.func,

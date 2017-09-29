@@ -113,7 +113,7 @@ function is(x, y) {
  * happens in oneOfType() for any type before the one that matched.
  */
 function PropTypeError(message) {
-  this.message = message;
+  this.message = __DEV__ ? message : 'PropTypeError'
   this.stack = '';
 }
 // Make `instanceof Error` still work for returned errors.

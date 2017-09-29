@@ -11,6 +11,8 @@
 
 'use strict';
 
+if (__DEV__) {
+
 var ReactPropTypeLocationNames = require('ReactPropTypeLocationNames');
 var ReactPropTypesSecret = require('ReactPropTypesSecret');
 
@@ -111,3 +113,7 @@ function checkReactTypeSpec(typeSpecs, values, location, componentName, element,
 }
 
 module.exports = checkReactTypeSpec;
+
+}
+
+module.exports = function() {};

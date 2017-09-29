@@ -11,38 +11,44 @@
 
 'use strict';
 
-var ReactInvalidSetStateWarningHook = require('ReactInvalidSetStateWarningHook');
-var ReactHostOperationHistoryHook = require('ReactHostOperationHistoryHook');
-var ReactComponentTreeHook = require('ReactComponentTreeHook');
-var ReactChildrenMutationWarningHook = require('ReactChildrenMutationWarningHook');
-var ExecutionEnvironment = require('ExecutionEnvironment');
+if (__DEV__) {
+  var ReactInvalidSetStateWarningHook = require('ReactInvalidSetStateWarningHook');
+  var ReactHostOperationHistoryHook = require('ReactHostOperationHistoryHook');
+  var ReactComponentTreeHook = require('ReactComponentTreeHook');
+  var ReactChildrenMutationWarningHook = require('ReactChildrenMutationWarningHook');
+  var ExecutionEnvironment = require('ExecutionEnvironment');
 
-var performanceNow = require('performanceNow');
-var warning = require('warning');
+  var performanceNow = require('performanceNow');
+  var warning = require('warning');
+}
 
 var hooks = [];
 var didHookThrowForEvent = {};
 
 function callHook(event, fn, context, arg1, arg2, arg3, arg4, arg5) {
-  try {
-    fn.call(context, arg1, arg2, arg3, arg4, arg5);
-  } catch (e) {
-    warning(
-      didHookThrowForEvent[event],
-      'Exception thrown by hook while handling %s: %s',
-      event,
-      e + '\n' + e.stack
-    );
-    didHookThrowForEvent[event] = true;
+  if (__DEV__) {
+    try {
+      fn.call(context, arg1, arg2, arg3, arg4, arg5);
+    } catch (e) {
+      warning(
+        didHookThrowForEvent[event],
+        'Exception thrown by hook while handling %s: %s',
+        event,
+        e + '\n' + e.stack
+      );
+      didHookThrowForEvent[event] = true;
+    }
   }
 }
 
 function emitEvent(event, arg1, arg2, arg3, arg4, arg5) {
-  for (var i = 0; i < hooks.length; i++) {
-    var hook = hooks[i];
-    var fn = hook[event];
-    if (fn) {
-      callHook(event, fn, hook, arg1, arg2, arg3, arg4, arg5);
+  if (__DEV__) {
+    for (var i = 0; i < hooks.length; i++) {
+      var hook = hooks[i];
+      var fn = hook[event];
+      if (fn) {
+        callHook(event, fn, hook, arg1, arg2, arg3, arg4, arg5);
+      }
     }
   }
 }
@@ -61,65 +67,74 @@ var currentTimerType = null;
 var lifeCycleTimerHasWarned = false;
 
 function clearHistory() {
-  ReactComponentTreeHook.purgeUnmountedComponents();
-  ReactHostOperationHistoryHook.clearHistory();
+  if (__DEV__) {
+    ReactComponentTreeHook.purgeUnmountedComponents();
+    ReactHostOperationHistoryHook.clearHistory();
+  }
 }
 
 function getTreeSnapshot(registeredIDs) {
-  return registeredIDs.reduce((tree, id) => {
-    var ownerID = ReactComponentTreeHook.getOwnerID(id);
-    var parentID = ReactComponentTreeHook.getParentID(id);
-    tree[id] = {
-      displayName: ReactComponentTreeHook.getDisplayName(id),
-      text: ReactComponentTreeHook.getText(id),
-      updateCount: ReactComponentTreeHook.getUpdateCount(id),
-      childIDs: ReactComponentTreeHook.getChildIDs(id),
-      // Text nodes don't have owners but this is close enough.
-      ownerID: ownerID || ReactComponentTreeHook.getOwnerID(parentID),
-      parentID,
-    };
-    return tree;
-  }, {});
+  if (__DEV__) {
+    return registeredIDs.reduce((tree, id) => {
+      var ownerID = ReactComponentTreeHook.getOwnerID(id);
+      var parentID = ReactComponentTreeHook.getParentID(id);
+      tree[id] = {
+        displayName: ReactComponentTreeHook.getDisplayName(id),
+        text: ReactComponentTreeHook.getText(id),
+        updateCount: ReactComponentTreeHook.getUpdateCount(id),
+        childIDs: ReactComponentTreeHook.getChildIDs(id),
+        // Text nodes don't have owners but this is close enough.
+        ownerID: ownerID || ReactComponentTreeHook.getOwnerID(parentID),
+        parentID,
+      };
+      return tree;
+    }, {});
+  }
+  return {};
 }
 
 function resetMeasurements() {
-  var previousStartTime = currentFlushStartTime;
-  var previousMeasurements = currentFlushMeasurements || [];
-  var previousOperations = ReactHostOperationHistoryHook.getHistory();
+  if (__DEV__) {
+    var previousStartTime = currentFlushStartTime;
+    var previousMeasurements = currentFlushMeasurements || [];
+    var previousOperations = ReactHostOperationHistoryHook.getHistory();
 
-  if (currentFlushNesting === 0) {
-    currentFlushStartTime = null;
-    currentFlushMeasurements = null;
+    if (currentFlushNesting === 0) {
+      currentFlushStartTime = null;
+      currentFlushMeasurements = null;
+      clearHistory();
+      return;
+    }
+
+    if (previousMeasurements.length || previousOperations.length) {
+      var registeredIDs = ReactComponentTreeHook.getRegisteredIDs();
+      flushHistory.push({
+        duration: performanceNow() - previousStartTime,
+        measurements: previousMeasurements || [],
+        operations: previousOperations || [],
+        treeSnapshot: getTreeSnapshot(registeredIDs),
+      });
+    }
+
     clearHistory();
-    return;
+    currentFlushStartTime = performanceNow();
+    currentFlushMeasurements = [];
   }
-
-  if (previousMeasurements.length || previousOperations.length) {
-    var registeredIDs = ReactComponentTreeHook.getRegisteredIDs();
-    flushHistory.push({
-      duration: performanceNow() - previousStartTime,
-      measurements: previousMeasurements || [],
-      operations: previousOperations || [],
-      treeSnapshot: getTreeSnapshot(registeredIDs),
-    });
-  }
-
-  clearHistory();
-  currentFlushStartTime = performanceNow();
-  currentFlushMeasurements = [];
 }
 
 function checkDebugID(debugID, allowRoot = false) {
-  if (allowRoot && debugID === 0) {
-    return;
-  }
-  if (!debugID) {
-    warning(false, 'ReactDebugTool: debugID may not be empty.');
+  if (__DEV__) {
+    if (allowRoot && debugID === 0) {
+      return;
+    }
+    if (!debugID) {
+      warning(false, 'ReactDebugTool: debugID may not be empty.');
+    }
   }
 }
 
 function beginLifeCycleTimer(debugID, timerType) {
-  if (currentFlushNesting === 0) {
+  if (!__DEV__ || currentFlushNesting === 0) {
     return;
   }
   if (currentTimerType && !lifeCycleTimerHasWarned) {
@@ -141,7 +156,7 @@ function beginLifeCycleTimer(debugID, timerType) {
 }
 
 function endLifeCycleTimer(debugID, timerType) {
-  if (currentFlushNesting === 0) {
+  if (!__DEV__ || currentFlushNesting === 0) {
     return;
   }
   if (currentTimerType !== timerType && !lifeCycleTimerHasWarned) {
@@ -170,132 +185,182 @@ function endLifeCycleTimer(debugID, timerType) {
 }
 
 function pauseCurrentLifeCycleTimer() {
-  var currentTimer = {
-    startTime: currentTimerStartTime,
-    nestedFlushStartTime: performanceNow(),
-    debugID: currentTimerDebugID,
-    timerType: currentTimerType,
-  };
-  lifeCycleTimerStack.push(currentTimer);
-  currentTimerStartTime = null;
-  currentTimerNestedFlushDuration = null;
-  currentTimerDebugID = null;
-  currentTimerType = null;
+  if (__DEV__) {
+    var currentTimer = {
+      startTime: currentTimerStartTime,
+      nestedFlushStartTime: performanceNow(),
+      debugID: currentTimerDebugID,
+      timerType: currentTimerType,
+    };
+    lifeCycleTimerStack.push(currentTimer);
+    currentTimerStartTime = null;
+    currentTimerNestedFlushDuration = null;
+    currentTimerDebugID = null;
+    currentTimerType = null;
+  }
 }
 
 function resumeCurrentLifeCycleTimer() {
-  var {startTime, nestedFlushStartTime, debugID, timerType} = lifeCycleTimerStack.pop();
-  var nestedFlushDuration = performanceNow() - nestedFlushStartTime;
-  currentTimerStartTime = startTime;
-  currentTimerNestedFlushDuration += nestedFlushDuration;
-  currentTimerDebugID = debugID;
-  currentTimerType = timerType;
+  if (__DEV__) {
+    var {startTime, nestedFlushStartTime, debugID, timerType} = lifeCycleTimerStack.pop();
+    var nestedFlushDuration = performanceNow() - nestedFlushStartTime;
+    currentTimerStartTime = startTime;
+    currentTimerNestedFlushDuration += nestedFlushDuration;
+    currentTimerDebugID = debugID;
+    currentTimerType = timerType;
+  }
 }
 
 var ReactDebugTool = {
   addHook(hook) {
-    hooks.push(hook);
+    if (__DEV__) {
+      hooks.push(hook);
+    }
   },
   removeHook(hook) {
-    for (var i = 0; i < hooks.length; i++) {
-      if (hooks[i] === hook) {
-        hooks.splice(i, 1);
-        i--;
+    if (__DEV__) {
+      for (var i = 0; i < hooks.length; i++) {
+        if (hooks[i] === hook) {
+          hooks.splice(i, 1);
+          i--;
+        }
       }
     }
   },
   isProfiling() {
-    return isProfiling;
+    if (__DEV__) {
+      return isProfiling;
+    }
+    return false;
   },
   beginProfiling() {
-    if (isProfiling) {
-      return;
-    }
+    if (__DEV__) {
+      if (isProfiling) {
+        return;
+      }
 
-    isProfiling = true;
-    flushHistory.length = 0;
-    resetMeasurements();
-    ReactDebugTool.addHook(ReactHostOperationHistoryHook);
+      isProfiling = true;
+      flushHistory.length = 0;
+      resetMeasurements();
+      ReactDebugTool.addHook(ReactHostOperationHistoryHook);
+    }
   },
   endProfiling() {
-    if (!isProfiling) {
-      return;
-    }
+    if (__DEV__) {
+      if (!isProfiling) {
+        return;
+      }
 
-    isProfiling = false;
-    resetMeasurements();
-    ReactDebugTool.removeHook(ReactHostOperationHistoryHook);
+      isProfiling = false;
+      resetMeasurements();
+      ReactDebugTool.removeHook(ReactHostOperationHistoryHook);
+    }
   },
   getFlushHistory() {
-    return flushHistory;
+    if (__DEV__) {
+      return flushHistory;
+    }
+    return [];
   },
   onBeginFlush() {
-    currentFlushNesting++;
-    resetMeasurements();
-    pauseCurrentLifeCycleTimer();
-    emitEvent('onBeginFlush');
+    if (__DEV__) {
+      currentFlushNesting++;
+      resetMeasurements();
+      pauseCurrentLifeCycleTimer();
+      emitEvent('onBeginFlush');
+    }
   },
   onEndFlush() {
-    resetMeasurements();
-    currentFlushNesting--;
-    resumeCurrentLifeCycleTimer();
-    emitEvent('onEndFlush');
+    if (__DEV__) {
+      resetMeasurements();
+      currentFlushNesting--;
+      resumeCurrentLifeCycleTimer();
+      emitEvent('onEndFlush');
+    }
   },
   onBeginLifeCycleTimer(debugID, timerType) {
-    checkDebugID(debugID);
-    emitEvent('onBeginLifeCycleTimer', debugID, timerType);
-    beginLifeCycleTimer(debugID, timerType);
+    if (__DEV__) {
+      checkDebugID(debugID);
+      emitEvent('onBeginLifeCycleTimer', debugID, timerType);
+      beginLifeCycleTimer(debugID, timerType);
+    }
   },
   onEndLifeCycleTimer(debugID, timerType) {
-    checkDebugID(debugID);
-    endLifeCycleTimer(debugID, timerType);
-    emitEvent('onEndLifeCycleTimer', debugID, timerType);
+    if (__DEV__) {
+      checkDebugID(debugID);
+      endLifeCycleTimer(debugID, timerType);
+      emitEvent('onEndLifeCycleTimer', debugID, timerType);
+    }
   },
   onBeginProcessingChildContext() {
-    emitEvent('onBeginProcessingChildContext');
+    if (__DEV__) {
+      emitEvent('onBeginProcessingChildContext');
+    }
   },
   onEndProcessingChildContext() {
-    emitEvent('onEndProcessingChildContext');
+    if (__DEV__) {
+      emitEvent('onEndProcessingChildContext');
+    }
   },
   onHostOperation(debugID, type, payload) {
-    checkDebugID(debugID);
-    emitEvent('onHostOperation', debugID, type, payload);
+    if (__DEV__) {
+      checkDebugID(debugID);
+      emitEvent('onHostOperation', debugID, type, payload);
+    }
   },
   onSetState() {
-    emitEvent('onSetState');
+    if (__DEV__) {
+      emitEvent('onSetState');
+    }
   },
   onSetChildren(debugID, childDebugIDs) {
-    checkDebugID(debugID);
-    childDebugIDs.forEach(checkDebugID);
-    emitEvent('onSetChildren', debugID, childDebugIDs);
+    if (__DEV__) {
+      checkDebugID(debugID);
+      childDebugIDs.forEach(checkDebugID);
+      emitEvent('onSetChildren', debugID, childDebugIDs);
+    }
   },
   onBeforeMountComponent(debugID, element, parentDebugID) {
-    checkDebugID(debugID);
-    checkDebugID(parentDebugID, true);
-    emitEvent('onBeforeMountComponent', debugID, element, parentDebugID);
+    if (__DEV__) {
+      checkDebugID(debugID);
+      checkDebugID(parentDebugID, true);
+      emitEvent('onBeforeMountComponent', debugID, element, parentDebugID);
+    }
   },
   onMountComponent(debugID) {
-    checkDebugID(debugID);
-    emitEvent('onMountComponent', debugID);
+    if (__DEV__) {
+      checkDebugID(debugID);
+      emitEvent('onMountComponent', debugID);
+    }
   },
   onBeforeUpdateComponent(debugID, element) {
-    checkDebugID(debugID);
-    emitEvent('onBeforeUpdateComponent', debugID, element);
+    if (__DEV__) {
+      checkDebugID(debugID);
+      emitEvent('onBeforeUpdateComponent', debugID, element);
+    }
   },
   onUpdateComponent(debugID) {
-    checkDebugID(debugID);
-    emitEvent('onUpdateComponent', debugID);
+    if (__DEV__) {
+      checkDebugID(debugID);
+      emitEvent('onUpdateComponent', debugID);
+    }
   },
   onBeforeUnmountComponent(debugID) {
-    checkDebugID(debugID);
-    emitEvent('onBeforeUnmountComponent', debugID);
+    if (__DEV__) {
+      checkDebugID(debugID);
+      emitEvent('onBeforeUnmountComponent', debugID);
+    }
   },
   onUnmountComponent(debugID) {
-    checkDebugID(debugID);
-    emitEvent('onUnmountComponent', debugID);
+    if (__DEV__) {
+      checkDebugID(debugID);
+      emitEvent('onUnmountComponent', debugID);
+    }
   },
   onTestEvent() {
-    emitEvent('onTestEvent');
+    if (__DEV__) {
+      emitEvent('onTestEvent');
+    }
   },
 };
 
@@ -303,12 +368,14 @@ var ReactDebugTool = {
 ReactDebugTool.addDevtool = ReactDebugTool.addHook;
 ReactDebugTool.removeDevtool = ReactDebugTool.removeHook;
 
-ReactDebugTool.addHook(ReactInvalidSetStateWarningHook);
-ReactDebugTool.addHook(ReactComponentTreeHook);
-ReactDebugTool.addHook(ReactChildrenMutationWarningHook);
-var url = (ExecutionEnvironment.canUseDOM && window.location.href) || '';
-if ((/[?&]react_perf\b/).test(url)) {
-  ReactDebugTool.beginProfiling();
+if (__DEV__) {
+  ReactDebugTool.addHook(ReactInvalidSetStateWarningHook);
+  ReactDebugTool.addHook(ReactComponentTreeHook);
+  ReactDebugTool.addHook(ReactChildrenMutationWarningHook);
+  var url = (ExecutionEnvironment.canUseDOM && window.location.href) || '';
+  if ((/[?&]react_perf\b/).test(url)) {
+    ReactDebugTool.beginProfiling();
+  }
 }
 
 module.exports = ReactDebugTool;

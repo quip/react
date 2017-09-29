@@ -138,6 +138,7 @@ module.exports = function(grunt) {
     'build-modules',
     'version-check',
     'browserify:basic',
+    'browserify:prod',
     'browserify:addons',
     'browserify:min',
     'browserify:addonsMin',

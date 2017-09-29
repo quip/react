@@ -61,6 +61,20 @@ var basic = {
   after: [derequire, simpleBannerify],
 };
 
+var prod = {
+  entries: [
+    './build/modules/ReactUMDEntry.js',
+  ],
+  outfile: './build/react.prod.js',
+  debug: false,
+  standalone: 'React',
+  transforms: [envifyProd],
+  // Apply as global transform so that we also envify fbjs and any other deps
+  globalTransforms: [envifyProd],
+  plugins: [collapser],
+  after: [derequire, bannerify],
+};
+
 var min = {
   entries: [
     './build/modules/ReactUMDEntry.js',
@@ -111,6 +125,7 @@ var addonsMin = {
 
 module.exports = {
   basic: basic,
+  prod: prod,
   min: min,
   addons: addons,
   addonsMin: addonsMin,

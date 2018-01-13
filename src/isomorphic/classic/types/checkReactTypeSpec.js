@@ -111,9 +111,7 @@ function checkReactTypeSpec(typeSpecs, values, location, componentName, element,
     }
   }
 }
-
 module.exports = checkReactTypeSpec;
-
-}
-
+} else {
 module.exports = function() {};
+}

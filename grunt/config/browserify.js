@@ -142,6 +142,21 @@ var basic = {
   after: [derequire, simpleBannerify],
 };
 
+var prod = {
+  entries: [
+    './build/node_modules/react/lib/ReactUMDEntry.js',
+  ],
+  outfile: './build/react.prod.js',
+  debug: false,
+  standalone: 'React',
+  transforms: [envifyProd],
+  // Apply as global transform so that we also envify fbjs and any other deps
+  globalTransforms: [envifyProd],
+  plugins: [collapser],
+  after: [derequire, bannerify],
+};
+
+
 var min = {
   entries: [
     './build/node_modules/react/lib/ReactUMDEntry.js',
@@ -205,6 +220,21 @@ var dom = {
   plugins: [collapser],
   after: [derequire, wrapperify, simpleBannerify],
 };
+
+var domProd = {
+  entries: [
+    './build/node_modules/react-dom/lib/ReactDOMUMDEntry.js',
+  ],
+  outfile: './build/react-dom.prod.js',
+  debug: false,
+  standalone: 'ReactDOM',
+  transforms: [shimSharedModules, envifyProd],
+  // Apply as global transform so that we also envify fbjs and any other deps
+  globalTransforms: [envifyProd],
+  plugins: [collapser],
+  after: [wrapperify, derequire, bannerify],
+};
+
 
 var domMin = {
   entries: [
@@ -290,10 +320,12 @@ var domFiberMin = {
 
 module.exports = {
   basic: basic,
+  prod: prod,
   min: min,
   addons: addons,
   addonsMin: addonsMin,
   dom: dom,
+  domProd: domProd,
   domMin: domMin,
   domServer: domServer,
   domServerMin: domServerMin,

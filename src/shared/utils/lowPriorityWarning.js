@@ -7,6 +7,8 @@
  * @providesModule lowPriorityWarning
  */
 
+ /* globals __REACT_RECORD_DEPRECATION_WARNING_HOOK__*/
+
 'use strict';
 
 /**
@@ -23,12 +25,13 @@
  * same logic and follow the same code paths.
  */
 
-var lowPriorityWarning = function() {};
-
-if (__DEV__) {
-  const printWarning = function(format, ...args) {
-    var argIndex = 0;
-    var message = 'Warning: ' + format.replace(/%s/g, () => args[argIndex++]);
+const recordWarning = function(format, ...args) {
+  var argIndex = 0;
+  var message = 'Warning: ' + format.replace(/%s/g, () => args[argIndex++]);
+  if (typeof __REACT_RECORD_DEPRECATION_WARNING_HOOK__ === 'function') {
+    __REACT_RECORD_DEPRECATION_WARNING_HOOK__(message);
+  }
+  if (__DEV__) {
     if (typeof console !== 'undefined') {
       console.warn(message);
     }
@@ -38,19 +41,19 @@ if (__DEV__) {
       // to find the callsite that caused this warning to fire.
       throw new Error(message);
     } catch (x) {}
-  };
+  }
+};
 
-  lowPriorityWarning = function(condition, format, ...args) {
-    if (format === undefined) {
-      throw new Error(
-        '`warning(condition, format, ...args)` requires a warning ' +
-          'message argument',
-      );
-    }
-    if (!condition) {
-      printWarning(format, ...args);
-    }
-  };
-}
+const lowPriorityWarning = function(condition, format, ...args) {
+  if (__DEV__ && format === undefined) {
+    throw new Error(
+      '`warning(condition, format, ...args)` requires a warning ' +
+        'message argument',
+    );
+  }
+  if (!condition) {
+    recordWarning(format, ...args);
+  }
+};
 
 module.exports = lowPriorityWarning;

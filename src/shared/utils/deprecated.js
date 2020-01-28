@@ -31,35 +31,33 @@ function deprecated<T: Function>(
   fn: T,
 ): T {
   var warned = false;
-  if (__DEV__) {
     var newFn = function() {
-      lowPriorityWarning(
-        warned,
-        /* eslint-disable no-useless-concat */
-        // Require examples in this string must be split to prevent React's
-        // build tools from mistaking them for real requires.
-        // Otherwise the build tools will attempt to build a '%s' module.
-        'React.%s is deprecated. Please use %s.%s from require' +
-          "('%s') " +
-          'instead.',
-        fnName,
-        newModule,
-        fnName,
-        newPackage,
-      );
-      /* eslint-enable no-useless-concat */
-      warned = true;
-      return fn.apply(ctx, arguments);
-    };
-    // We need to make sure all properties of the original fn are copied over.
-    // In particular, this is needed to support PropTypes
-    Object.assign(newFn, (fn: Object));
+    lowPriorityWarning(
+      warned,
+      /* eslint-disable no-useless-concat */
+      // Require examples in this string must be split to prevent React's
+      // build tools from mistaking them for real requires.
+      // Otherwise the build tools will attempt to build a '%s' module.
+      'React.%s is deprecated. Please use %s.%s from require' +
+        "('%s') " +
+        'instead.',
+      fnName,
+      newModule,
+      fnName,
+      newPackage,
+    );
+    /* eslint-enable no-useless-concat */
+    warned = true;
+    return fn.apply(ctx, arguments);
+  };
+  // We need to make sure all properties of the original fn are copied over.
+  // In particular, this is needed to support PropTypes
+  Object.assign(newFn, (fn: Object));
 
-    // Flow is not smart enough to figure out that newFn is of the same type as
-    // fn. Since we don't want to lose out the type of the function, casting
-    // to any and force flow to use T.
-    return ((newFn: any): T);
-  }
+  // Flow is not smart enough to figure out that newFn is of the same type as
+  // fn. Since we don't want to lose out the type of the function, casting
+  // to any and force flow to use T.
+  return ((newFn: any): T);
 
   return fn;
 }

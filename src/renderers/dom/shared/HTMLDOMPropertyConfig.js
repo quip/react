@@ -94,6 +94,7 @@ var HTMLDOMPropertyConfig = {
     label: 0,
     lang: 0,
     list: 0,
+    loading: 0,
     loop: HAS_BOOLEAN_VALUE,
     low: 0,
     manifest: 0,

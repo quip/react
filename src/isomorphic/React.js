@@ -103,9 +103,6 @@ let warnedForCreateClass = false;
 if (canDefineProperty) {
   Object.defineProperty(React, 'PropTypes', {
     get() {
-      if (window.PropTypes) {
-        return window.PropTypes;
-      }
       lowPriorityWarning(
         didWarnPropTypesDeprecated,
         'Accessing PropTypes via the main React package is deprecated,' +

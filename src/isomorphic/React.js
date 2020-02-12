@@ -103,9 +103,6 @@ let warnedForCreateClass = false;
 if (canDefineProperty) {
   Object.defineProperty(React, 'PropTypes', {
     get() {
-      if (this.customPropTypes) {
-        return this.customPropTypes;
-      }
       lowPriorityWarning(
         didWarnPropTypesDeprecated,
         'Accessing PropTypes via the main React package is deprecated,' +
@@ -116,9 +113,6 @@ if (canDefineProperty) {
       );
       didWarnPropTypesDeprecated = true;
       return ReactPropTypes;
-    },
-    set: function(customPropTypes) {
-      this.customPropTypes = customPropTypes;
     },
   });
 

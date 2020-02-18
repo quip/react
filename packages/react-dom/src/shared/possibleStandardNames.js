@@ -92,6 +92,7 @@ const possibleStandardNames = {
   label: 'label',
   lang: 'lang',
   list: 'list',
+  loading: 'loading',
   loop: 'loop',
   low: 'low',
   manifest: 'manifest',

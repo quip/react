@@ -1085,6 +1085,7 @@ const attributes = [
     tagName: 'feSpotLight',
   },
   {name: 'list', read: getAttribute('list')}, // TODO: This should match the ID of a datalist element and then read property.
+  {name: 'loading', tagName: 'img'},
   {
     name: 'local',
     read: getSVGAttribute('local'),

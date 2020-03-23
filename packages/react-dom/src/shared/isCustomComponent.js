@@ -8,6 +8,13 @@
  */
 
 function isCustomComponent(tagName: string, props: Object) {
+  // Quip custom tags
+    switch (tagName) {
+      case 'annotation':
+      case 'control':
+      case 'editorui':
+        return true;
+  }
   if (tagName.indexOf('-') === -1) {
     return typeof props.is === 'string';
   }

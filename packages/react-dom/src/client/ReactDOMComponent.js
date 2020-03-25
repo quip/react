@@ -473,6 +473,7 @@ export function createElement(
     if (namespaceURI === HTML_NAMESPACE) {
       if (
         !isCustomComponentTag &&
+        type !== 'editorui' &&
         Object.prototype.toString.call(domElement) ===
           '[object HTMLUnknownElement]' &&
         !Object.prototype.hasOwnProperty.call(warnedUnknownTags, type)

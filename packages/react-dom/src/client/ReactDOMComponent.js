@@ -473,6 +473,8 @@ export function createElement(
     if (namespaceURI === HTML_NAMESPACE) {
       if (
         !isCustomComponentTag &&
+        type !== 'annotation' &&
+        type !== 'control' &&
         type !== 'editorui' &&
         Object.prototype.toString.call(domElement) ===
           '[object HTMLUnknownElement]' &&
